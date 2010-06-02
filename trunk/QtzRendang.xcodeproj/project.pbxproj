@@ -13,6 +13,7 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		9398392F11AD134F00D66E87 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9398392E11AD134F00D66E87 /* Quartz.framework */; };
+		93E9617611B6F43B00BED739 /* QtzRendang.icns in Resources */ = {isa = PBXBuildFile; fileRef = 93E9617511B6F43B00BED739 /* QtzRendang.icns */; };
 		D0D37B2A11B331580000A678 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D37B2811B331580000A678 /* QTKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +31,7 @@
 		8D1107310486CEB800E47090 /* QtzRendang-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "QtzRendang-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* QtzRendang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QtzRendang.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9398392E11AD134F00D66E87 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		93E9617511B6F43B00BED739 /* QtzRendang.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = QtzRendang.icns; sourceTree = "<group>"; };
 		D0D37B2811B331580000A678 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
@@ -111,6 +113,7 @@
 				8D1107310486CEB800E47090 /* QtzRendang-Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
+				93E9617511B6F43B00BED739 /* QtzRendang.icns */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -169,6 +172,7 @@
 			files = (
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
+				93E9617611B6F43B00BED739 /* QtzRendang.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
