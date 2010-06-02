@@ -2,7 +2,6 @@
 //  QtzRendang
 
 #import "QtzRendangAppDelegate.h"
-#import "QTMovieExtensions.h"
 
 @implementation PathControlPeerQCView
 
