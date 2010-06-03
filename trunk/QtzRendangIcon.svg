@@ -7,20 +7,43 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="744.09448819"
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre1 r21720"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="QtzRendangIcon.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   inkscape:export-filename="/Volumes/Stuf/Now/Code/Xcode/QtzRendangCheckouts/QtzGoogle/QtzRendangIcon.png"
+   inkscape:export-filename="/Users/ruahm/Downloads~~/QtzRendangIcon.png"
    inkscape:export-xdpi="78.68"
    inkscape:export-ydpi="78.68">
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient3612">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop3614" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop3616" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3596">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0.75609756;"
+         offset="0"
+         id="stop3598" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0.13452914"
+         offset="1"
+         id="stop3600" />
+    </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="5.7142857 : 429.03823 : 1"
@@ -36,6 +59,33 @@
          stdDeviation="8.6152554"
          id="feGaussianBlur5491" />
     </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3596"
+       id="linearGradient3602"
+       x1="236.37569"
+       y1="379.60059"
+       x2="236.37569"
+       y2="506.1597"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3612"
+       id="linearGradient3618"
+       x1="270.39062"
+       y1="466.46875"
+       x2="270.39062"
+       y2="684.5625"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(8.0812205,-262.63966)" />
+    <filter
+       inkscape:collect="always"
+       id="filter3640">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.87976562"
+         id="feGaussianBlur3642" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -45,7 +95,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.49497475"
-     inkscape:cx="296.40222"
+     inkscape:cx="171.65189"
      inkscape:cy="653.1238"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -53,7 +103,7 @@
      inkscape:window-width="878"
      inkscape:window-height="629"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="22"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
@@ -108,6 +158,10 @@
        id="path5424"
        d="m 124.53622,113.54427 0,308.32323"
        style="fill:none;stroke:#ffffff;stroke-width:44.4227562;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:0;stroke-opacity:1;stroke-dasharray:44.42275835, 44.42275835;stroke-dashoffset:0" />
+    <path
+       style="fill:url(#linearGradient3618);fill-opacity:1;stroke:none;opacity:0.77777778;filter:url(#filter3640)"
+       d="m 286.89372,203.82909 c -96.09244,0 -183.94883,18.76291 -251.28125,49.78125 l 0,102.59375 c 0,36.40571 29.313035,65.71875 65.71875,65.71875 l 354.28125,0 c 36.40571,0 65.71875,-29.31304 65.71875,-65.71875 l 0,-109.875 c -64.85221,-26.63345 -146.14594,-42.5 -234.4375,-42.5 z"
+       id="rect3604" />
     <rect
        ry="65.714287"
        y="100.93361"
