@@ -20,6 +20,8 @@ IBOutlet NSPathControl* dralagate;
 NSWindow *window;
 
 IBOutlet NSPathControl* sourcePath;
+IBOutlet NSPathControl* audioSourcePath;
+
 IBOutlet PathControlPeerQCView* qtzPreview;
 
 IBOutlet NSPopUpButton* aspectRatio;
@@ -30,6 +32,7 @@ IBOutlet NSTextField* width;
 IBOutlet NSTextField* height;
 IBOutlet NSTextField* duration;
 IBOutlet NSTextField* fps;
+IBOutlet NSTextField* blankIntroDuration;
 
 IBOutlet QCCompositionParameterView* qtzParams;
 

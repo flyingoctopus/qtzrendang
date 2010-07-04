@@ -56,6 +56,7 @@
 {
 	// Insert code here to initialize your application 
    [destinationPath setURL:[NSURL fileURLWithPath:[@"~/Movies" stringByExpandingTildeInPath] isDirectory:YES]];
+   [audioSourcePath setURL:[NSURL fileURLWithPath:[@"~/Music" stringByExpandingTildeInPath] isDirectory:YES]];
    
    // init quicktime - we will be using it on a worker thread, it needs to be inited on the main thread
    [[[QTMovie alloc] init] autorelease];
@@ -82,6 +83,26 @@
       {
          [destinationFilename setStringValue:[[[path URLByDeletingPathExtension] lastPathComponent] stringByAppendingString:@".mov"]];
          userHasSpecifiedName = NO; // reaffirm this, the textChanged gets called by the setStringValue
+      }
+   }
+}
+
+-(IBAction)audioSrcPathChanged:(id)sender
+{
+   NSURL* audioFilePath = [audioSourcePath URL];
+ 
+   // TODO support checkbox for using audio duration for movie instead of triggering setduration when new audio chosen
+   BOOL useAudioFileDuration = YES;
+   if (useAudioFileDuration)
+   {
+      NSError* error;
+      QTMovie* audioSource = [QTMovie movieWithURL:audioFilePath error:&error];
+      if (audioSource)
+      {
+         QTTime dur = [audioSource duration];
+         NSTimeInterval val;
+         if (QTGetTimeInterval(dur, &val) && (val > 0.0))
+            [duration setDoubleValue:val];
       }
    }
 }
@@ -129,7 +150,7 @@
 -(IBAction)renderClicked:(id)sender
 {
    if (!renderingNow)
-      [self renderMovie:[[sourcePath URL] path] frameSize:NSMakeSize([width intValue], [height intValue]) duration:[duration doubleValue] frameDuration:(1.0/[self fps])];
+      [self renderMovie:[[sourcePath URL] path] frameSize:NSMakeSize([width intValue], [height intValue]) duration:[duration doubleValue] frameDuration:(1.0/[self fps]) introDuration:[blankIntroDuration doubleValue]];
 }
 
 -(void) textDidChange:(NSNotification*)note 
@@ -223,6 +244,7 @@
    if (ebl)
    {
       [progress stopAnimation:self];
+      [qtzParams setCompositionRenderer:qtzPreview];
       [qtzPreview resumeRendering];
    }
    else
@@ -232,6 +254,7 @@
    }
 
    [sourcePath setEnabled:ebl];
+   [audioSourcePath setEnabled:ebl];
 
    [aspectRatio setEnabled:ebl];
    [width setEnabled:ebl];
@@ -247,7 +270,7 @@
    [renderIt setEnabled:ebl];
 }
 
--(void)renderMovie:(NSString*)compositionFile frameSize:(NSSize)res duration:(double)durationg frameDuration:(double)frameDuration
+-(void)renderMovie:(NSString*)compositionFile frameSize:(NSSize)res duration:(double)durationg frameDuration:(double)frameDuration  introDuration:(double)introDuration
 {      
    // confirm overwrite if exists
    NSURL* saveToUrl = [self destinationURL];
@@ -302,7 +325,6 @@
          double timeEnd = durationg;
 
          NSAutoreleasePool*			pool = [NSAutoreleasePool new];
-         NSTimeInterval				time;
          NSImage* frame;
 
          // create a QTTime value to be used as a duration when adding 
@@ -319,8 +341,32 @@
                                                               
          QCComposition* composition = [QCComposition compositionWithFile:compositionFile];
          CGColorSpaceRef co = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
-         QCRenderer* renderer = [[QCRenderer alloc]initOffScreenWithSize:NSMakeSize(pixW, pixH) colorSpace:co composition:composition];
-         for (time=0; time <= timeEnd; time += timeStep)
+         NSSize destSz = NSMakeSize(pixW, pixH);
+         QCRenderer* renderer = [[QCRenderer alloc]initOffScreenWithSize:destSz colorSpace:co composition:composition];
+         //[qtzParams setCompositionRenderer:renderer];
+//         NSArray* inputPorts = [composition inputKeys];
+         id inputParameters = [qtzPreview  propertyListFromInputValues];
+         [renderer setInputValuesWithPropertyList:inputParameters];
+//         [renderer setValuesForKeysWithDictionary:[qtzPreview dictionaryWithValuesForKeys:inputPorts]];
+         
+//         NSTimeInterval curTime = 0;
+
+         // render 1st frame for introDuration (useful for audio that doesn't start exactly on beat 1)
+         if (introDuration > 0.0)
+         {
+            QTTime introdqt     = QTMakeTimeWithTimeInterval(introDuration);
+//            NSImage* blankImage = [[[NSImage alloc] initWithSize:destSz] autorelease];
+//            [blankImage setBackgroundColor:[NSColor blackColor]];
+
+            [renderer renderAtTime:0 arguments:nil];
+            frame = [renderer snapshotImage];
+
+            [mMovie addImage:frame forDuration:introdqt withAttributes:myDict];
+          
+//            curTime += introDuration;
+         }
+         
+         for (NSTimeInterval time=0; time <= timeEnd-introDuration; time += timeStep)
          {
             NSAutoreleasePool*			pool2 = [NSAutoreleasePool new];
             [renderer renderAtTime:time arguments:nil];
@@ -330,6 +376,31 @@
          }
          CFRelease(co);
 
+         // now apply audio from the audio file
+         {
+            NSURL* audioFilePath = [audioSourcePath URL];
+            NSError* error;
+            QTMovie* audioSource = [QTMovie movieWithURL:audioFilePath error:&error];
+            if (audioSource)
+            {
+               NSArray *audioTracks = [audioSource tracksOfMediaType:QTMediaTypeSound];
+               QTTrack *audioTrack = nil;
+               if( [audioTracks count] > 0 )
+                  audioTrack = [audioTracks objectAtIndex:0];
+
+               if( audioTrack )
+               {
+                  QTTimeRange totalRange;
+                  totalRange.time = QTZeroTime; // TODO param for start offset for audio file
+                  //totalRange.duration = [[audioTrackMovie attributeForKey:QTMovieDurationAttribute] QTTimeValue];
+                  // use user-specified duration instead of audio file duration (i.e. allow truncation)
+                  totalRange.duration = QTMakeTimeWithTimeInterval(durationg);
+
+                  [mMovie insertSegmentOfTrack:audioTrack timeRange:totalRange atTime:QTZeroTime];
+               }
+            }
+         }
+            
          [pool release];
 
          // now save the file
