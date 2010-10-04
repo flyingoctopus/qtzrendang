@@ -51,6 +51,7 @@ bool renderingNow;
 @property (assign) IBOutlet NSWindow *window;
 
 -(IBAction)sourcePathChanged:(id)sender;
+-(IBAction)audioSrcPathChanged:(id)sender;
 
 -(IBAction)widthChanged:(id)sender;
 -(IBAction)heightChanged:(id)sender;
@@ -66,6 +67,9 @@ bool renderingNow;
 -(double)fps;
 
 -(void)setCompResolution:(NSSize)res;
--(void)renderMovie:(NSString*)composition frameSize:(NSSize)res duration:(double)duration frameDuration:(double)frameDuration;
+-(void)renderMovie:(NSString*)composition frameSize:(NSSize)res duration:(double)duration frameDuration:(double)frameDuration introDuration:(double)introDuration;
+
+-(void)updateProgress:(double)curTime duration:(double)duration;
+-(void)updateProgress:(NSNumber*)curTime;
 
 @end
