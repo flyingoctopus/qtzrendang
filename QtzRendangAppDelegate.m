@@ -91,12 +91,18 @@
 {
    NSURL* audioFilePath = [audioSourcePath URL];
  
-   // TODO support checkbox for using audio duration for movie instead of triggering setduration when new audio chosen
+   // TODO support checkbox for using audio duration for movie instead of always triggering setduration when new audio chosen
    BOOL useAudioFileDuration = YES;
    if (useAudioFileDuration)
    {
       NSError* error;
-      QTMovie* audioSource = [QTMovie movieWithURL:audioFilePath error:&error];
+      QTMovie* audioSource = [[[QTMovie alloc] initWithAttributes:
+         [NSDictionary dictionaryWithObjectsAndKeys:
+            [NSNumber numberWithBool:YES], QTMovieOpenForPlaybackAttribute,
+            audioFilePath, QTMovieURLAttribute,
+            [NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute, // we need the file scanned fully so we get an accurate duration
+            nil]
+       error:&error] autorelease];
       if (audioSource)
       {
          QTTime dur = [audioSource duration];
@@ -243,13 +249,13 @@
    
    if (ebl)
    {
-      [progress stopAnimation:self];
+      [progress setIndeterminate:YES];
       [qtzParams setCompositionRenderer:qtzPreview];
       [qtzPreview resumeRendering];
    }
    else
    {
-      [progress startAnimation:self];
+      [progress setIndeterminate:NO];
       [qtzPreview pauseRendering];
    }
 
@@ -261,6 +267,7 @@
    [height setEnabled:ebl];
    [duration setEnabled:ebl];
    [fps setEnabled:ebl];
+   [blankIntroDuration setEnabled:ebl];
 
    [qtzParams setHidden:!ebl]; // slightly suck
 
@@ -268,6 +275,19 @@
    [destinationFilename setEnabled:ebl];
    
    [renderIt setEnabled:ebl];
+}
+
+-(void)updateProgress:(double)curTime duration:(double)maxduration
+{
+   [progress setIndeterminate:NO];
+   [progress setMinValue:0];
+   [progress setMaxValue:maxduration];
+   [progress setDoubleValue:curTime];
+}
+
+-(void)updateProgress:(NSNumber*)curTime
+{
+   [progress setDoubleValue:[curTime doubleValue]];
 }
 
 -(void)renderMovie:(NSString*)compositionFile frameSize:(NSSize)res duration:(double)durationg frameDuration:(double)frameDuration  introDuration:(double)introDuration
@@ -300,8 +320,9 @@
    }
 
    renderingNow = YES;
-   [progress startAnimation:self]; // ha, this would work if we had things on another thread... which we should do asap!
+   [progress startAnimation:self];
    [self setUIEnabled:NO];
+   [self updateProgress:0 duration:durationg];
    
    NSBlockOperation* theOp = [NSBlockOperation blockOperationWithBlock: 
    ^{
@@ -330,6 +351,10 @@
          // create a QTTime value to be used as a duration when adding 
          // the image to the movie
          QTTime durationqt     = QTMakeTimeWithTimeInterval(timeStep);
+         // now adjust the timeStep so it matches the QT frame duration (so the render stays in sync with the timeline)
+         QTGetTimeInterval(durationqt, &timeStep);
+         if ((frameDuration - timeStep) != 0)
+         NSLog(@"Adjusted (%e) render frame rate from specified frame rate to avoid sync drift", (frameDuration - timeStep));
          // when adding images we must provide a dictionary
          // specifying the codec attributes
          NSDictionary *myDict = nil;
@@ -343,27 +368,18 @@
          CGColorSpaceRef co = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
          NSSize destSz = NSMakeSize(pixW, pixH);
          QCRenderer* renderer = [[QCRenderer alloc]initOffScreenWithSize:destSz colorSpace:co composition:composition];
-         //[qtzParams setCompositionRenderer:renderer];
-//         NSArray* inputPorts = [composition inputKeys];
          id inputParameters = [qtzPreview  propertyListFromInputValues];
          [renderer setInputValuesWithPropertyList:inputParameters];
-//         [renderer setValuesForKeysWithDictionary:[qtzPreview dictionaryWithValuesForKeys:inputPorts]];
-         
-//         NSTimeInterval curTime = 0;
 
          // render 1st frame for introDuration (useful for audio that doesn't start exactly on beat 1)
          if (introDuration > 0.0)
          {
             QTTime introdqt     = QTMakeTimeWithTimeInterval(introDuration);
-//            NSImage* blankImage = [[[NSImage alloc] initWithSize:destSz] autorelease];
-//            [blankImage setBackgroundColor:[NSColor blackColor]];
 
             [renderer renderAtTime:0 arguments:nil];
             frame = [renderer snapshotImage];
 
             [mMovie addImage:frame forDuration:introdqt withAttributes:myDict];
-          
-//            curTime += introDuration;
          }
          
          for (NSTimeInterval time=0; time <= timeEnd-introDuration; time += timeStep)
@@ -373,6 +389,8 @@
             frame = [renderer snapshotImage];
             [mMovie addImage:frame forDuration:durationqt withAttributes:myDict];
             [pool2 release];
+         
+            [self performSelectorOnMainThread:@selector(updateProgress:) withObject:[NSNumber numberWithDouble:time] waitUntilDone:NO];
          }
          CFRelease(co);
 
@@ -380,7 +398,14 @@
          {
             NSURL* audioFilePath = [audioSourcePath URL];
             NSError* error;
-            QTMovie* audioSource = [QTMovie movieWithURL:audioFilePath error:&error];
+            QTMovie* audioSource = [[[QTMovie alloc] initWithAttributes:
+               [NSDictionary dictionaryWithObjectsAndKeys:
+                  [NSNumber numberWithBool:YES], QTMovieEditableAttribute,
+                  audioFilePath, QTMovieURLAttribute,
+                  [NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute, // we need the file scanned fully so we get an accurate duration
+                  nil]
+               error:&error] autorelease];
+               
             if (audioSource)
             {
                NSArray *audioTracks = [audioSource tracksOfMediaType:QTMediaTypeSound];
